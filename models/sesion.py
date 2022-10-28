@@ -13,7 +13,7 @@ class Sesion():
       #Creation cursor
       cursor = con.cursor()
       #Query sql
-      sql = 'SELECT id,nombres,apellido,email,estado_usuario,rol_id FROM usuario WHERE email=%s and password=%s'
+      sql = 'SELECT id,nombres,apellidos,email,estado_usuario,rol_id FROM usuario WHERE email=%s and password=%s'
       #Execute SQL query
       cursor.execute(sql,[self.email,self.password])
       #Get data from cursor
@@ -37,10 +37,10 @@ class Sesion():
       #Create cursor
       cursor = con.cursor()
       #Prepare query - Update data
-      sql = "UPDATE usuario SET token = %s, estado_token = '1', WHERE id = %s"
+      sql = "UPDATE usuario SET token = %s, estado_token = '1' WHERE id = %s"
 
       try:
-        cursor.execute(sql[token,user_id])
+        cursor.execute(sql,[token,user_id])
         con.commit() #Save
         return json.dumps({'status':True,'message':'Token actualizado'})
       except con.Error as error:
