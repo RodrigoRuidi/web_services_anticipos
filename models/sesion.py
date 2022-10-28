@@ -60,7 +60,7 @@ class Sesion():
       sql = "SELECT estado_token FROM usuario WHERE id = %s"
 
       #Execute query
-      cursor.execute(sql[user_id])
+      cursor.execute(sql,[user_id])
 
       datos = cursor.fetchone()
 
