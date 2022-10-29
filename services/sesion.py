@@ -28,7 +28,7 @@ def login():
         #Save user id in the token
         user_id = datos_sesion_JSON['data']['id']
         #Generate token
-        token = jwt.encode({'user_id':user_id,'exp': datetime.datetime.utcnow()+datetime.timedelta(seconds=60)},SecretKey.JWT_SECRET_JEY)
+        token = jwt.encode({'user_id':user_id,'exp': datetime.datetime.utcnow()+datetime.timedelta(seconds=3600)},SecretKey.JWT_SECRET_JEY)
 
         #Include token in the response
         datos_sesion_JSON['data']['token'] = token
