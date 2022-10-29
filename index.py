@@ -4,6 +4,7 @@ from services.rol import ws_rol
 from services.sede import ws_sede
 from services.tipo_comprobante import ws_tipo_comprobante
 from services.rubro import ws_rubro
+from services.motivo_anticipo import ws_motivo_anticipo
 
 #Create app variable with Flask
 app = Flask(__name__)
@@ -14,6 +15,7 @@ app.register_blueprint(ws_rol)
 app.register_blueprint(ws_sede)
 app.register_blueprint(ws_tipo_comprobante)
 app.register_blueprint(ws_rubro)
+app.register_blueprint(ws_motivo_anticipo)
 
 @app.route('/')
 def home():
