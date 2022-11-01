@@ -6,6 +6,8 @@ from services.tipo_comprobante import ws_tipo_comprobante
 from services.rubro import ws_rubro
 from services.motivo_anticipo import ws_motivo_anticipo
 from services.tarifa import ws_tarifa
+from services.estado_anticipo import ws_estado_anticipo
+
 
 #Create app variable with Flask
 app = Flask(__name__)
@@ -18,6 +20,7 @@ app.register_blueprint(ws_tipo_comprobante)
 app.register_blueprint(ws_rubro)
 app.register_blueprint(ws_motivo_anticipo)
 app.register_blueprint(ws_tarifa)
+app.register_blueprint(ws_estado_anticipo)
 
 
 @app.route('/')
