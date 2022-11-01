@@ -42,7 +42,7 @@ class Anticipo():
         else:
             return json.dumps({'status': False, 'data': '', 'message': 'No hay datos para mostrar'})
 
-    def listar_anticipos_admin(self, estado_id=0):
+    def listar_anticipos_jefe(self, estado_id=0):
             # Abrir la conexion
             con = bd().open
 
@@ -69,3 +69,26 @@ class Anticipo():
 
             else:
                 return json.dumps({'status': False, 'data': '', 'message': 'No hay datos para mostrar'})
+
+
+    def listar_anticipos_admin(self):
+        # Abrir la conexion
+        con = bd().open
+
+        # Crear un cursor
+        cursor = con.cursor()
+        sql = "SELECT an.descripcion, an.fecha_inicio, an.fecha_fin, an.monto_total, es.descripcion AS estado FROM anticipo AS an INNER JOIN estado_anticipo AS es on (es.id = an.estado_anticipo_id) WHERE an.estado_anticipo_id = 3"
+        cursor.execute(sql)
+        # Almacenar los datos que devuelva de la conulsta
+        datos = cursor.fetchall()
+
+        # Cerrar el cursor y la conexion
+        cursor.close()
+        con.close()
+
+        # Retornar datos
+        if (datos):
+            return json.dumps({'status': True, 'data': datos, 'message': 'Listado anticipos admin'}, cls=CustomJsonEncoder)
+
+        else:
+            return json.dumps({'status': False, 'data': '', 'message': 'No hay datos para mostrar'})

@@ -23,20 +23,32 @@ def listar_anticipos_docente():
         return jsonify(datos), 401
 
 
-@ws_anticipo.route('/anticipos/admin/listar', methods=['POST'])
+@ws_anticipo.route('/anticipos/jefe/listar', methods=['POST'])
 @vt.validar_token
-def listar_anticipos_admin():
+def listar_anticipos_jefe():
     if request.method == 'POST':
           if not 'estado_anticipo_id' in request.form:
               obj = Anticipo()
-              rpta_anticipos_admin = obj.listar_anticipos_admin()
-              datos = json.loads(rpta_anticipos_admin)
+              rpta_anticipos_jefe = obj.listar_anticipos_jefe()
+              datos = json.loads(rpta_anticipos_jefe)
               return jsonify(datos), 200
           else :
             estado_anticipo_id = request.form['estado_anticipo_id']
             obj = Anticipo()
-            rpta_anticipos_admin = obj.listar_anticipos_admin(estado_anticipo_id)
-            datos = json.loads(rpta_anticipos_admin)
+            rpta_anticipos_jefe = obj.listar_anticipos_jefe(estado_anticipo_id)
+            datos = json.loads(rpta_anticipos_jefe)
             return jsonify(datos), 200
+    else:
+        return jsonify(datos), 401
+
+
+@ws_anticipo.route('/anticipos/admin/listar', methods=['POST'])
+@vt.validar_token
+def listar_anticipos_admin():
+    if request.method == 'POST':
+        obj = Anticipo()
+        rpta_anticipos_admin = obj.listar_anticipos_admin()
+        datos = json.loads(rpta_anticipos_admin)
+        return jsonify(datos), 200
     else:
         return jsonify(datos), 401
