@@ -7,6 +7,7 @@ from services.rubro import ws_rubro
 from services.motivo_anticipo import ws_motivo_anticipo
 from services.tarifa import ws_tarifa
 from services.estado_anticipo import ws_estado_anticipo
+from services.anticipo import ws_anticipo
 
 
 #Create app variable with Flask
@@ -21,6 +22,7 @@ app.register_blueprint(ws_rubro)
 app.register_blueprint(ws_motivo_anticipo)
 app.register_blueprint(ws_tarifa)
 app.register_blueprint(ws_estado_anticipo)
+app.register_blueprint(ws_anticipo)
 
 
 @app.route('/')
