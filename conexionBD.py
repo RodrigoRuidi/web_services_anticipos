@@ -6,7 +6,7 @@ class Conexion():
     def __init__(self):
         self.dblink = dbc.connect(host=Config.DB_HOST,user=Config.DB_USER,
         passwd=Config.DB_PASSWORD,db=Config.DB_NAME,port=Config.DB_PORT,
-        cursorclass=dbc.cursors.DictCursor)
+        cursorclass=dbc.cursors.DictCursor,ssl=True)
 
     @property
     def open(self):

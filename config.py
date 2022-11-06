@@ -1,9 +1,9 @@
 class Config():
-    DB_HOST = 'localhost'
-    DB_PORT = 3306
+    DB_HOST = 'containers-us-west-102.railway.app'
+    DB_PORT = 5877
     DB_USER = 'root'
-    DB_PASSWORD = ''
-    DB_NAME ='bd_anticipos'
+    DB_PASSWORD = 'stnerz0TPyiLdiVP6WGA'
+    DB_NAME ='railway'
 
 class SecretKey():
     JWT_SECRET_JEY = '#PROYECTO_ANTICIPOS_2022_#'
