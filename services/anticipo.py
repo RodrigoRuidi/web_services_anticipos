@@ -6,6 +6,26 @@ import validar_token as vt
 
 ws_anticipo = Blueprint('ws_anticipo', __name__)
 
+@ws_anticipo.route('/anticipo/registrar', methods=['POST'])
+@vt.validar_token #f
+def registrar_anticipo():
+    if request.method == 'POST':
+        descripcion = request.form['descripcion']
+        fecha_inicio = request.form['fecha_inicio']
+        fecha_fin = request.form['fecha_fin']
+        motivo_anticipo_id = request.form['motivo_anticipo_id']
+        sede_id = request.form['sede_id']
+        usuario_id = request.form['docente_id']
+
+        obj_anticipo = Anticipo(descripcion,fecha_inicio,fecha_fin,motivo_anticipo_id,sede_id,usuario_id)
+        rpta_JSON = obj_anticipo.registrar()
+        datos_anticipo = json.loads(rpta_JSON)
+
+        if datos_anticipo['status']:
+            return jsonify(datos_anticipo), 201 #CREATED
+        else:
+            return jsonify(datos_anticipo), 500 #INTERNAL SERVER ERROR
+
 
 @ws_anticipo.route('/anticipos/docente/listar', methods=['POST'])
 @vt.validar_token

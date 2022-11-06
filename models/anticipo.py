@@ -1,19 +1,68 @@
 from conexionBD import Conexion as bd
 import json
 from util import CustomJsonEncoder
+from datetime import datetime
 
 
 class Anticipo():
-    def __init__(self, id=None, descripcion=None, fecha_inicio=None, fecha_fin=None, monto_total=None, estado_anticipo_id=None, motivo_anticipo_id=None, sede_id=None, usuario_id=None):
-        self.id = id
+    def __init__(self, descripcion=None, fecha_inicio=None, fecha_fin=None, motivo_anticipo_id=None, sede_id=None, usuario_id=None):
         self.descripcion = descripcion
         self.fecha_inicio = fecha_inicio
         self.fecha_fin = fecha_fin
-        self.monto_total = monto_total
-        self.estado_anticipo_id = estado_anticipo_id
         self.motivo_anticipo_id = motivo_anticipo_id
         self.sede_id = sede_id
         self.usuario_id = usuario_id
+
+    def registrar(self):
+        #Open connection
+        con = bd().open
+        #Configure transaction
+        con.autocommit = False
+        #Create cursor
+        cursor = con.cursor()
+
+        try:
+
+            #Difference days
+            dias = datetime.strptime(
+                self.fecha_fin, "%Y-%m-%d") - datetime.strptime(self.fecha_inicio, "%Y-%m-%d")
+
+            #Generate total amount
+            sql = "SELECT SUM(monto_maximo)* %s AS monto_rubros_por_dia FROM tarifa t INNER JOIN rubro r ON t.rubro_id = r.id WHERE sede_id = %s AND r.se_calcula_por_dia = %s"
+            cursor.execute(sql, [dias,self.sede_id,'1'])
+            datos = cursor.fetchone()
+            monto_rubros_por_dia = datos['monto_rubros_por_dia']
+
+            sql = "SELECT monto_maximo AS monto_rubro_fijo FROM tarifa t INNER JOIN rubro r ON t.rubro_id = r.id WHERE sede_id = %s AND r.se_calcula_por_dia = %s"
+            cursor.execute(sql, [self.sede_id, '0'])
+            datos = cursor.fetchone()
+            monto_rubro_fijo = datos['monto_rubro_fijo']
+            monto_total = float(monto_rubros_por_dia) + float(monto_rubro_fijo)
+
+            #Prepare statement for register a new anticipo
+            sql = "INSERT INTO anticipo(descripcion,fecha_inicio,fecha_fin,monto_total,estado_anticipo_id,motivo_anticipo_id,sede_id,usuario_id) VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"
+            cursor.execute(sql,[self.descripcion,self.fecha_inicio,self.fecha_fin,monto_total,1,self.motivo_anticipo_id,self.sede_id,self.usuario_id])
+
+            #Get registered anticipo sale id
+            anticipo_id = con.insert_id()
+
+            sql = "INSERT INTO historial_anticipo(estado_id,tipo,anticipo_id) VALUES (%s,%s,%s)"
+            cursor.execute(sql, [1,'A',anticipo_id])
+
+            #confirm the transaction
+            con.commit()
+
+            #Return response
+            return json.dumps({'status':True,'data':{'anticipo_id':anticipo_id},'message':'Anticipo registered'})
+
+        except con.Error as error:
+            #Revoque all operations
+            con.rollback()
+            return json.dumps({'status':False,'data':'','message':format(error)},cls=CustomJsonEncoder)
+        finally:
+            cursor.close()
+            con.close()
+
 
     def listar_anticipos_docente(self, docente_id):
         # Abrir la conexion
