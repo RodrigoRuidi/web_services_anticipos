@@ -1,17 +1,87 @@
 from conexionBD import Conexion as bd
 import json
 from util import CustomJsonEncoder
+from datetime import date
 
 
 class Informe_gasto():
-    def __init__(self, id=None, num_informe=None, fecha_hora=None, estado_id=None, total_rendir=None, total_rendido=None, anticipo_id=None):
-        self.id = id
-        self.num_informe = num_informe
-        self.fecha_hora = fecha_hora
-        self.estado_id = estado_id
-        self.total_rendir = total_rendir
-        self.total_rendido = total_rendido
+    def __init__(self,anticipo_id=None,detalle_comprobantes=None):
         self.anticipo_id = anticipo_id
+        self.detalle_comprobantes = detalle_comprobantes
+
+    def registrar(self):
+        #Open connection
+        con = bd().open
+        #Configure transaction
+        con.autocommit = False
+        #Create cursor
+        cursor = con.cursor()
+
+        try:
+
+            #Generate informe
+            anio = date.today().year
+            sql = "SELECT usuario_id, monto_total FROM anticipo WHERE id = %s"
+            cursor.execute(sql,[self.anticipo_id])
+            datos = cursor.fetchone()
+            docente_id = datos['usuario_id']
+            monto_rendir = datos['monto_total']
+            monto_rendido = 0
+            num_informe = str(anio)+"-"+str(docente_id)+"-"+str(self.anticipo_id)
+
+            sql = "INSERT INTO informe_gasto(num_informe,estado_id,total_rendir,total_rendido,anticipo_id) VALUES(%s,%s,%s,%s,%s)"
+            cursor.execute(sql,[num_informe,1,monto_rendir,monto_rendido,self.anticipo_id])
+
+            #Get registered informe gasto id
+            informe_gasto_id = con.insert_id()
+
+            sql = "INSERT INTO historial_anticipo(estado_id,tipo,anticipo_id) VALUES (%s,%s,%s)"
+            cursor.execute(sql, [1, 'I', self.anticipo_id])
+
+            sql = "INSERT INTO historial_anticipo(estado_id,tipo,anticipo_id) VALUES (%s,%s,%s)"
+            cursor.execute(sql, [5, 'A', self.anticipo_id])
+
+            sql = "UPDATE anticipo set estado_anticipo_id = %s WHERE id = %s"
+            cursor.execute(sql, [5, self.anticipo_id])
+
+            #Comprobantes
+            json_detalle_comprobantes_array = json.loads(self.detalle_comprobantes)
+
+            sql = "INSERT INTO comprobante(serie,correlativo,fecha_emision,monto_total,ruc,descripcion,tipo_comprobante_id,rubro_id,foto,num_operacion,informe_gasto_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+
+            monto_rendido = 0
+
+            for comprobante in json_detalle_comprobantes_array:
+                serie = comprobante['serie']
+                correlativo = comprobante['correlativo']
+                fecha_emision = comprobante['fecha_emision']
+                monto_total = comprobante['monto_total']
+                ruc = comprobante['ruc']
+                descripcion = comprobante['descripcion']
+                tipo_comprobante_id = comprobante['tipo_comprobante_id']
+                rubro_id = comprobante['rubro_id']
+                foto = comprobante['foto']
+                num_operacion = comprobante['num_operacion']
+                monto_rendido += float(monto_total)
+                cursor.execute(
+                    sql, [serie, correlativo, fecha_emision, monto_total, ruc, descripcion, tipo_comprobante_id, rubro_id, foto, num_operacion,informe_gasto_id])
+
+
+            sql = "UPDATE informe_gasto SET total_rendido = %s WHERE id = %s"
+            cursor.execute(sql, [monto_rendido, informe_gasto_id])
+            #confirm the transaction
+            con.commit()
+            #Return response
+            return json.dumps({'status': True, 'data': {'Informe Nro ':num_informe}, 'message': 'Informe gasto created'})
+
+        except con.Error as error:
+            #Revoque all operations
+            con.rollback()
+            return json.dumps({'status': False, 'data': '', 'message': format(error)}, cls=CustomJsonEncoder)
+        finally:
+            cursor.close()
+            con.close()
+
 
 
     def listar_informes_gasto_docente(self, docente_id):

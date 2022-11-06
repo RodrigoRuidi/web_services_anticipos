@@ -1,0 +1,4 @@
+[
+    {"serie":"B001","correlativo":"0001","fecha_emision":"2022-11-06","monto_total":"80","ruc":"1234567899","descripcion":"","tipo_comprobante_id":"2","rubro_id":"1","foto":"","num_operacion":""},
+    {"serie":"F001","correlativo":"0001","fecha_emision":"2022-11-06","monto_total":"100","ruc":"1234562899","descripcion":"","tipo_comprobante_id":"1","rubro_id":"2","foto":"","num_operacion":""}
+]
