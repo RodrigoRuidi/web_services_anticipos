@@ -2,6 +2,6 @@
 FROM python:3.8-slim
 
 # Install pip requirements
-RUN apt-get -y install default-libmysqlclient-dev
+RUN apt-get install libmysqlclient-dev
 COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
